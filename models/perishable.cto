@@ -1,0 +1,164 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace org.birthvenue.scm
+
+/**
+ * The type of product being shipped
+ */
+enum ProductType {
+  o CHICKEN
+  o FISH
+}
+
+/**
+ * The status of an order
+ */
+enum OrderStatus {
+  o AT_COMPANY
+  o REJECTED_BY_LOGISTICS_COMPANY
+  o ACCEPTED_BY_LOGISTICS_COMPANY
+  o REJECTED_BY_RETAILER
+  o AT_RETAILER
+  o ACCEPTED_BY_RETAILER
+  o REJECTED_BY_STORE
+  o AT_STORE
+  o ACCEPTED_BY_STORE
+  o REJECTED_BY_CUSTOMER
+  o ACCEPTED_BY_CUSTOMER
+}
+
+enum Edible {
+  o YES
+  o NO
+}
+
+/**
+ * An abstract transaction that is related to an Order
+ */
+abstract transaction OrderTransaction {
+  --> Order order
+}
+
+/**
+ * An temperature reading for an order. E.g. received from a
+ * device within a temperature controlled shipping container
+ * We assume it is coming from IoT device.
+ */
+transaction TemperatureReading extends OrderTransaction {
+  o Double celcius
+}
+
+/**
+ * 
+ */
+transaction OrderReceivedByLogistics extends OrderTransaction {
+
+}
+/**
+ *
+ */
+transaction OrderReceivedByRetailer extends OrderTransaction { 
+
+}
+/**
+ *
+ */
+transaction OrderReceivedByStore extends OrderTransaction {
+
+}
+/**
+ *
+ */
+transaction OrderScannedByCustomer extends OrderTransaction {
+  
+}
+/**
+ * An order being tracked as an asset on the ledger
+ */
+asset Order identified by orderId {
+  o String orderId
+  o ProductType type
+  o OrderStatus status
+  o Edible ediblityStatus
+  o TemperatureReading[] temperatureReadings optional
+  --> Contract contract
+}
+
+/**
+ * Defines a contract between the Manufacturer, the 3PL, the Retailer and the Store. Edibility
+ * of the batch (order) is decided based on the min temperature and max temperature.
+ */
+asset Contract identified by contractId {
+  o String contractId
+  --> Manufacturer manufacturer
+  --> LogisticsCompany logisticsCompany
+  --> Retailer retailer
+  --> Store store
+  o DateTime arrivalDateTime
+  o Double unitPrice
+  o Double minTemperature
+  o Double maxTemperature
+}
+
+/**
+ * A concept for a simple street address
+ */
+concept Address {
+  o String city 
+  o String country optional
+  o String street optional
+  o String zip optional
+}
+
+/**
+ * An abstract participant type in this business network
+ */
+abstract participant Business identified by email {
+  o String email
+  o String name
+  o Address address
+}
+
+/**
+ * A Manufacturer is a type of participant in the network
+ */
+participant Manufacturer extends Business {
+  
+}
+
+/**
+ * A LogisticsCompany is a type of participant in the network
+ */
+participant LogisticsCompany extends Business {
+}
+
+/**
+ * A Retailer is a type of participant in the network
+ */
+participant Retailer extends Business {
+}
+
+/**
+ * A Store is a type of participant in the network
+ */
+participant Store extends Business {
+}
+
+/**
+ * INITIALIZING PARTICIPANTS
+ */
+transaction InititalizeParticipants {
+}
+
